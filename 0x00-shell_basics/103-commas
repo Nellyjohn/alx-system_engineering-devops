@@ -1,0 +1,2 @@
+#!/bin/bash
+ls -ap --sort=version --format=commas
