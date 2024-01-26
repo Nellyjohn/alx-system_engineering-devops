@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# This script script that displays lines containing the bash word
+# shellcheck disable=SC2009
+
+proc=$(ps -aux | grep bash)
+echo "$proc"
