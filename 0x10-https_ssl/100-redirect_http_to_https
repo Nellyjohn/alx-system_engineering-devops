@@ -20,12 +20,12 @@ global
 defaults
         log     global
         mode    http
-	option  httplog
+        option  httplog
         option  dontlognull
         timeout connect 5000
         timeout client  50000
         timeout server  50000
-	errorfile 400 /etc/haproxy/errors/400.http
+        errorfile 400 /etc/haproxy/errors/400.http
         errorfile 403 /etc/haproxy/errors/403.http
         errorfile 408 /etc/haproxy/errors/408.http
         errorfile 500 /etc/haproxy/errors/500.http
@@ -34,18 +34,19 @@ defaults
         errorfile 504 /etc/haproxy/errors/504.http
 
 frontend www-http
-	bind *:80
-	mode http
-	http-request set-header X-Forwarded-Proto:\ http
-	default_backend www-backend
+        bind *:80
+        mode http
+        http-request set-header X-Forwarded-Proto:\ http
+        default_backend www-backend
 
 frontend www-https
-	bind *:443 ssl crt /etc/ssl/private/www.realkenandcom.tech.pem
-	http-request set-header X-Forwarded-Proto:\ https
-	default_backend www-backend
+        bind *:443 ssl crt /etc/ssl/private/www.realkenandcom.tech.pem
+        http-request set-header X-Forwarded-Proto:\ https
+	http-request redirect scheme https code 301 unless { ssl_fc }
+        default_backend www-backend
 
 backend www-backend
-	balance roundrobin
-	#redirect scheme https if !{ ssl_fc }
-	server 528343-web-01 100.26.168.29:80 check
-	server 528343-web-02 54.173.39.101:80 check
+        balance roundrobin
+        #redirect scheme https if !{ ssl_fc }
+        server 528343-web-01 100.26.168.29:80 check
+        server 528343-web-02 54.173.39.101:80 check
