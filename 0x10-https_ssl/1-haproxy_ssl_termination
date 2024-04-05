@@ -7,7 +7,6 @@ global
         user haproxy
         group haproxy
         daemon
-	maxconn 2048
 	tune.ssl.default-dh-param 2048
 
         # Default SSL material locations
@@ -22,9 +21,7 @@ global
 defaults
         log     global
         mode    http
-	option forwardfor
-	option http-server-close
-        option  httplog
+	option  httplog
         option  dontlognull
         timeout connect 5000
         timeout client  50000
@@ -39,6 +36,7 @@ defaults
 
 frontend www-http
 	bind *:80
+	mode http
 	reqadd X-Forwarded-Proto:\ http
 	default_backend www-backend
 
@@ -49,5 +47,6 @@ frontend www-https
 
 backend www-backend
 	balance roundrobin
+	redirect scheme https if !{ ssl_fc }
 	server 528343-web-01 100.26.168.29:80 check
 	server 528343-web-02 54.173.39.101:80 check
