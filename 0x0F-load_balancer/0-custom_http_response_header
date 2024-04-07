@@ -1,30 +1,42 @@
 #!/usr/bin/env bash
 # This script configures a brand new Ubuntu machine to the requirements asked in this task
 
-sudo apt-get update
-sudo apt-get -y install nginx
-sudo mkdir /var/www/html/
-sudo touch /var/www/html/index.html
-echo "Hello World!" | sudo tee /var/www/html/index.html
-sudo touch /var/www/html/404.html
-echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html
+server_name=$(hostname)
+sudo apt-get update -y
+sudo apt-get install nginx -y
+sudo ufw allow 'Nginx HTTP'
+echo "Hello World!" > /var/www/html/index.nginx-debian.html
+echo "Ceci n'est pas une error_page" > /usr/share/nginx/html/custom_404.html
+echo "server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
 
-printf %s "server {
-        listen 80;
-        listen [::]:80;
-	add_header X-Served-By $hostname;
-        root   /var/www/html;
-        index  index.html index.htm;
+    root /var/www/html;
 
-        location /redirect_me {
-                return 301 http://www.youtube.com/watch?v=QH2-TGUlwu4;
-        }
+    # Add index.php to the list if you are using PHP
+    index index.html index.htm index.nginx-debian.html;
 
-	error_pagev 404 /404.html;
-	location /404 {
-		root /var/www/html;
-		internal
+    server_name _;
+
+    location / {
+        # First attempt to serve request as file, then
+        # as a directory, then fall back to displaying a 404.
+        try_files \$uri \$uri/ =404;
+    }
+
+    error_page 404 /custom_404.html;
+    location = /custom_404.html {
+        root /var/www/html;
+        internal;
+    }
+
+    location /redirect_me {
+        return 301 https://www.youtube.com/watch?v=3lFkDc6dFoY;
+    }
+
+    add_header X-Served-By $server_name;
+	
 }
-" | sudo tee /etc/nginx/sites-available/default
-sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
-sudo service nginx restarti
+" > /etc/nginx/sites-enabled/default
+
+sudo systemctl restart nginx
