@@ -1,0 +1,15 @@
+# configures nginx on web server 01
+server {
+    listen      80 default_server;
+    listen      [::]:80 default_server ipv6only=on;
+    server_name 54.197.95.97;
+    add_header  X-Served-By 528343-web-01;
+    location = /airbnb-onepage/ {
+        proxy_pass http://127.0.0.1:5000/airbnb-onepage/;
+    }
+    error_page 404 /custom_404.html;
+    location /404 {
+        root /var/www/html;
+        internal;
+    }
+}
